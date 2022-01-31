@@ -20,8 +20,6 @@ _resolution: tuple[int, int] = display.Info().current_w, display.Info().current_
 
 _main_canvas: Surface = display.set_mode(_resolution, SCALED)
 
-pause_icon: image = image.load("/Users/yamansirajaldeen/Documents/SortingVisualizer/icons/test.png")
-
 Color = tuple[int, int, int]
 
 

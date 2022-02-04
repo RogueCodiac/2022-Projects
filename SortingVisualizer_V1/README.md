@@ -24,6 +24,6 @@ This visualizer visualizes the following sorting algorithms:
 22. Radix Sort V2 (A variation of Radix Sort (LSD))
 
 
-The color wheels allow the user to change the display colors of the different elements (i.e the bars, background, accessed values, and selected values).
-Bars are colored whenever they are accessed.
-                                                
+The color wheels allow the user to change the display colors of the different elements (i.e the bars, background, accessed values, and selected values), while the slider changes creates a new array based on the set value. The size is constrained the factors of the user's horizontal resolution, as to prevent improperly rendered bars.
+
+Bars are colored whenever they are accessed.                                  

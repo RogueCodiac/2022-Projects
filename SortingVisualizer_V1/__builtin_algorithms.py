@@ -615,13 +615,20 @@ def radix_sort(array: Visual_Array, version: int = 0) -> None:
     if array.only_positive:
         return
 
-    h_size: int = len(array) // 2
+    for i in range(len(array)):
+        if array[i] < 0:
+            fn_index: int = i
+            break
 
-    for i in range(h_size):
-        if not array.economical:
-            array[i], array[i + h_size] = array[i + h_size], array[i]
-        else:
-            array.swap(i, i + h_size)
+    merge(array, 0, fn_index - 1, len(array) - 1)
+
+    # h_size: int = len(array) // 2
+    #
+    # for i in range(h_size):
+    #     if not array.economical:
+    #         array[i], array[i + h_size] = array[i + h_size], array[i]
+    #     else:
+    #         array.swap(i, i + h_size)
 
 
 """Radix Sort V2"""

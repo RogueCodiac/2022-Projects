@@ -427,9 +427,9 @@ class VisualArray(MainWindow):
         if not values:
             return False
 
-        assert _WR_FACTORS[0] < len(values) <= _resolution[
+        assert _WR_FACTORS[0] <= len(values) <= _resolution[
             0], f"len(values) larger than resolution width ({_resolution[0]}) " \
-                f"or less than minimum allowable"
+                f"or less than minimum allowable ({_WR_FACTORS[0]})"
         assert not (_resolution[0] % len(values)), f"resolution width ({_resolution[0]}) not divisible by len(values)"
         return True
 
@@ -438,7 +438,7 @@ class VisualArray(MainWindow):
         if sample_size is None:
             return
 
-        assert _WR_FACTORS[0] < sample_size, "sample_size was not given or less than minimum allowable"
+        assert _WR_FACTORS[0] <= sample_size, f"sample_size was not given or less than minimum allowable ({_WR_FACTORS[0]})"
         assert sample_size <= _resolution[0], f"sample size larger than resolution width ({_resolution[0]})"
         assert not (_resolution[0] % sample_size), f"resolution width ({_resolution[0]}) not divisible by sample_size"
 

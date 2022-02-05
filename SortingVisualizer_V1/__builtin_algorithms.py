@@ -358,10 +358,10 @@ def find_min_run(n: int, init: int) -> int:
 
 
 def merge(array: Visual_Array, l: int, m: int, r: int) -> None:
-    array_length1 = m - l + 1
-    array_length2 = r - m
-    left = [array[l + i] for i in range(array_length1)]
-    right = [array[m + i + 1] for i in range(array_length2)]
+    array_length1, array_length2 = m - l + 1, r - m
+
+    left: list[Bar] = [array[l + i] for i in range(array_length1)]
+    right: list[Bar] = [array[m + i + 1] for i in range(array_length2)]
 
     i, j, k = 0, 0, l
 
@@ -620,15 +620,14 @@ def radix_sort(array: Visual_Array, version: int = 0) -> None:
             fn_index: int = i
             break
 
-    merge(array, 0, fn_index - 1, len(array) - 1)
+    if fn_index != len(array) // 2:
+        return merge(array, 0, fn_index - 1, len(array) - 1)
 
-    # h_size: int = len(array) // 2
-    #
-    # for i in range(h_size):
-    #     if not array.economical:
-    #         array[i], array[i + h_size] = array[i + h_size], array[i]
-    #     else:
-    #         array.swap(i, i + h_size)
+    for i in range(fn_index):
+        if not array.economical:
+            array[i], array[i + fn_index] = array[i + fn_index], array[i]
+        else:
+            array.swap(i, i + fn_index)
 
 
 """Radix Sort V2"""

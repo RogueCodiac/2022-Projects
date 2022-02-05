@@ -1,4 +1,4 @@
-This visualizer visualizes the following sorting algorithms:
+This visualizer contains the following sorting algorithms:
 
 1.  Bogo Sort
 2.  Bubble Sort

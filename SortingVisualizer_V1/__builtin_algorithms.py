@@ -359,9 +359,7 @@ def find_min_run(n: int, init: int) -> int:
 
 def merge(array: Visual_Array, l: int, m: int, r: int) -> None:
     array_length1, array_length2 = m - l + 1, r - m
-
-    left: list[Bar] = [array[l + i] for i in range(array_length1)]
-    right: list[Bar] = [array[m + i + 1] for i in range(array_length2)]
+    left, right = [array[l + i] for i in range(array_length1)], [array[m + i + 1] for i in range(array_length2)]
 
     i, j, k = 0, 0, l
 

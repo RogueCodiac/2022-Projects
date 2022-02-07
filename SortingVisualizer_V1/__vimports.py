@@ -15,8 +15,6 @@ from __builtin_algorithms import *
 
 from time import sleep
 
-from collections import deque
-
 VisualArray = list[any]
 
 SortingAlgorithm = Union[Callable[Union[VisualArray, list], any], None]

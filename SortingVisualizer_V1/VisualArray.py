@@ -1,9 +1,9 @@
 from __future__ import annotations
 
 from __vimports import Bar, Color, MainWindow, Qt, SortingAlgorithm, ThreadedTask, Union, \
-    _TWR_FACTORS, ticker, _resolution, app, shuffle, rand_array, QAction, sleep, deque, \
-    QSlider, QMenu, QPushButton, QFont, bubble_sort, insertion_sort, gnome_sort, quick_sort, \
-    selection_sort, shaker_sort, comb_sort, brick_sort, heap_sort, intro_sort, shell_sort, tim_sort, \
+    _TWR_FACTORS, ticker, _resolution, app, shuffle, rand_array, QAction, sleep, QSlider, QMenu, \
+    QPushButton, QFont, bubble_sort, insertion_sort, gnome_sort, quick_sort, selection_sort, \
+    shaker_sort, comb_sort, brick_sort, heap_sort, intro_sort, shell_sort, tim_sort, \
     merge_sort, radix_sort, radix_sort_v2, hybrid_QSort_v2, hybrid_QSort, middle_quick_sort, \
     binary_insertion_sort, bim_sort, qim_sort, m_qim_sort, bogo_sort, sysexit
 
@@ -11,8 +11,6 @@ from __vimports import Bar, Color, MainWindow, Qt, SortingAlgorithm, ThreadedTas
 
 _WR_FACTORS: list[int] = _TWR_FACTORS[-20:] if 20 < len(_TWR_FACTORS) else \
     [1] * (20 - len(_TWR_FACTORS)) + _TWR_FACTORS  # Slider ticks constant
-
-_CACHE: deque = deque()
 
 _BUILTIN_FUNCS: dict[str, SortingAlgorithm] = {' '.join(__temp.__name__.title().split('_')): __temp for __temp in
                                                [bogo_sort,
@@ -53,7 +51,7 @@ class VisualArray(MainWindow):
                  sample_size: int = _resolution[0], select_color: Color = (0, 255, 0),
                  bar_color: Color = (255, 255, 255), access_color: Color = (255, 0, 0),
                  is_separated: bool = True, background_color: Color = (0, 0, 0),
-                 economical: bool = False, no_toolBar: bool = False) -> None:
+                 economical: bool = False, no_toolBar: bool = False, delay: float = 0.001) -> None:
         """Assertions"""
         if VisualArray.check_given_values(values):
             sample_size = len(values)  # Checks the length of the given values.
@@ -77,6 +75,8 @@ class VisualArray(MainWindow):
 
         self.delay: float = 0.001  # A virtual delay to slow down the visualization.
 
+        self.running: bool = False  # Indicates whether the executed function is paused.
+
         """Bar attributes"""
 
         bar_width: int = _resolution[0] // sample_size - is_separated  # Width of the bars of the array.
@@ -89,7 +89,7 @@ class VisualArray(MainWindow):
         super(VisualArray, self).__init__(color=background_color, bar_color=bar_color,
                                           selection_color=select_color, access_color=access_color,
                                           bar_width=bar_width, is_separated=is_separated,
-                                          only_positive=only_positive, no_toolBar=no_toolBar)
+                                          only_positive=only_positive, no_toolBar=no_toolBar, delay=delay)
 
         self.setWindowTitle("Sorting Visualizer")
 
@@ -108,6 +108,8 @@ class VisualArray(MainWindow):
                                         range(len(values))]  # Creates and draws the bars from values.
 
         self.cache_counter: int = max(_WR_FACTORS[0] // 8, len(self) // 40)
+
+        self.bar_width, self.is_separated = None, None
 
         self.update()
 
@@ -153,7 +155,7 @@ class VisualArray(MainWindow):
 
             return self._bar_objects[index]
 
-        if self.cache_counter <= len(_CACHE):
+        if self.cache_counter <= len(self.cache):
             self.process_cache()
 
         index = int(index)
@@ -193,7 +195,7 @@ class VisualArray(MainWindow):
                 quit()
             app.processEvents()
 
-        if self.cache_counter <= len(_CACHE):
+        if self.cache_counter <= len(self.cache):
             self.process_cache()
 
         self._bar_objects[index] = self.bar_at(new_val, index)
@@ -210,20 +212,6 @@ class VisualArray(MainWindow):
         self.algorithm = func if func is not None else self.algorithm
 
         app.exec_()
-
-    def _real_threaded_fill(self, index: int, color: Color) -> None:
-        """Actual function that changes the color of a bar"""
-
-        self.nu_fill(self._bar_objects[index], color)
-
-        sleep(self.delay)
-
-        _CACHE.append(index)
-
-    def threaded_fill(self, index: int, color: Color) -> None:
-        """Creates a thread to change the color of the bar to self.access color for self.delay seconds"""
-
-        self.thread_pool.tryStart(ThreadedTask(self, self._real_threaded_fill, index, color))
 
     def quit(self) -> None:
         self.running = True
@@ -373,7 +361,7 @@ class VisualArray(MainWindow):
         def change_eco() -> None:
             self.economical = not self.economical
             self.eco_button.setText(f"Efficient: {self.economical}")
-            for __i in _CACHE:
+            for __i in self.cache:
                 self.load_bar(self._bar_objects[__i])
 
         self.eco_button.triggered.connect(change_eco)
@@ -389,13 +377,6 @@ class VisualArray(MainWindow):
             self.bar_at(self[j], i), self.bar_at(self[i], j)
 
         ticker(self.update)
-
-    def process_cache(self) -> None:
-        self.bar_at(self._bar_objects[(i := _CACHE.popleft())], i)
-
-    def clear_cache(self) -> None:
-        [self.bar_at(self._bar_objects[(i := _CACHE.pop())], i) for _ in range(len(_CACHE))]
-        self.update()
 
     def clear(self) -> None:
         [self.bar_at(self._bar_objects[i], i) for i in range(len(self))]
@@ -477,11 +458,6 @@ class VisualArray(MainWindow):
             self.algorithm(self)
             self.end_sort()
 
-    def select(self, index: int) -> None:
-        """Marks the index by selection color"""
-
-        self.nu_fill(self._bar_objects[index], self.selection_color)
-
     def rand_values(self) -> list[int]:
         """Returns an list of random values"""
 
@@ -500,7 +476,7 @@ class VisualArray(MainWindow):
     def change_size(self, size: int) -> None:
         """Creates a new array with the given size"""
 
-        _CACHE.clear()
+        self.cache.clear()
 
         self.finished = False
 
@@ -545,14 +521,14 @@ class VisualArray(MainWindow):
             super().__setattr__(attrs[element], self.color_wheel.currentColor())
 
             if element == 2 and not self.economical:
-                for i in _CACHE:
+                for i in self.cache:
                     self.nu_fill(self._bar_objects[i], self.access_color)
 
             else:
                 self.clear_cache() if self.economical and element == 3 else ...
 
                 for i in range(len(self)):
-                    if i in _CACHE:
+                    if i in self.cache:
                         self.bar_at(self._bar_objects[i], i)
                         self.nu_fill(self._bar_objects[i], self.access_color)
                         continue

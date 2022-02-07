@@ -6,6 +6,8 @@ from PyQt5.QtWidgets import QLabel, QApplication, QMainWindow, QAction, \
     QToolBar, QPushButton, QColorDialog
 
 from typing import Union, Callable, TypeVar
+from collections import deque
+from time import sleep
 from sys import argv
 
 
@@ -218,7 +220,7 @@ class MainWindow(QMainWindow):
 
     def __init__(self, color: Color, bar_color: Color, access_color: Color,
                  selection_color: Color, bar_width: int, is_separated: bool,
-                 only_positive: bool, no_toolBar: bool) -> None:
+                 only_positive: bool, no_toolBar: bool, delay: float) -> None:
         super().__init__()
 
         if not no_toolBar:  # Does not have any effect in the app.
@@ -250,7 +252,9 @@ class MainWindow(QMainWindow):
 
         self.only_positive: bool = only_positive  # Indicates whether the array contains only positive values.
 
-        self.running: bool = False
+        self.cache: deque = deque()
+
+        self.delay: float = delay
 
         """Color attributes"""
 
@@ -293,6 +297,32 @@ class MainWindow(QMainWindow):
         self.nu_fill((bar.x(), 0, self.bar_width, _resolution[1]), self.color)
         self.nu_fill(bar, self.bar_color)
         return bar
+
+    def process_cache(self) -> None:
+        self.bar_at(self._bar_objects[(i := self.cache.popleft())], i)
+
+    def clear_cache(self) -> None:
+        [self.bar_at(self._bar_objects[(i := self.cache.pop())], i) for _ in range(len(self.cache))]
+        self.update()
+
+    def select(self, index: int) -> None:
+        """Marks the index by selection color"""
+
+        self.nu_fill(self._bar_objects[index], self.selection_color)
+
+    def _real_threaded_fill(self, index: int, color: Color) -> None:
+        """Actual function that changes the color of a bar"""
+
+        self.nu_fill(self._bar_objects[index], color)
+
+        sleep(self.delay)
+
+        self.cache.append(index)
+
+    def threaded_fill(self, index: int, color: Color) -> None:
+        """Creates a thread to change the color of the bar to self.access color for self.delay seconds"""
+
+        self.thread_pool.tryStart(ThreadedTask(self, self._real_threaded_fill, index, color))
 
     def threaded_update(self) -> None:
         """Creates a thread that updates the screen"""

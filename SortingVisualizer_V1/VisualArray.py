@@ -109,8 +109,6 @@ class VisualArray(MainWindow):
 
         self.cache_counter: int = max(_WR_FACTORS[0] // 8, len(self) // 40)
 
-        self.bar_width, self.is_separated = None, None
-
         self.update()
 
     def __str__(self) -> str:

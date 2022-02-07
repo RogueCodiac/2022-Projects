@@ -252,9 +252,9 @@ class MainWindow(QMainWindow):
 
         self.only_positive: bool = only_positive  # Indicates whether the array contains only positive values.
 
-        self.cache: deque = deque()
+        self.cache: deque = deque()  # Cache used to store access bars.
 
-        self.delay: float = delay
+        self.delay: float = delay  # Artificial delay to slow down the sorting.
 
         """Color attributes"""
 

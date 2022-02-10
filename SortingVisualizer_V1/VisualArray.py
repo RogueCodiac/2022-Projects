@@ -1,7 +1,7 @@
 from __future__ import annotations
 
-from __vimports import Bar, Color, MainWindow, Qt, SortingAlgorithm, ThreadedTask, Union, \
-    _TWR_FACTORS, ticker, _resolution, app, shuffle, rand_array, QAction, sleep, QSlider, QMenu, \
+from __vimports import Bar, Color, MainWindow, Qt, SortingAlgorithm, Union, _TWR_FACTORS, \
+    ticker, _resolution, app, shuffle, rand_array, QAction, QSlider, QMenu, \
     QPushButton, QFont, bubble_sort, insertion_sort, gnome_sort, quick_sort, selection_sort, \
     shaker_sort, comb_sort, brick_sort, heap_sort, intro_sort, shell_sort, tim_sort, \
     merge_sort, radix_sort, radix_sort_v2, hybrid_QSort_v2, hybrid_QSort, middle_quick_sort, \
